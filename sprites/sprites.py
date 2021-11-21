@@ -64,7 +64,6 @@ class Player(pg.sprite.Sprite):
         self.rect.y = self.position.y
 
 
-
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
@@ -88,7 +87,6 @@ class Car(pg.sprite.Sprite):
         if self.rect.y > settings.SCREENHEIGHT:
             self.rect.x = random.randint(250, 520)
             self.rect.y = -100
-
 
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x, self.rect.y))

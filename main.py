@@ -11,6 +11,8 @@ def main():
 
     while g.running:
         g.new()
+        if g.player.condition != "Alive":
+            g.enterGameOverMenu()
 
     pg.display.quit()
     pg.quit()

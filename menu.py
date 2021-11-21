@@ -106,6 +106,7 @@ class CreditMenu(Menu):
 class GameOverMenu(Menu):
     def __init__(self, game):
         Menu.__init__(self, game)
+        self.currentMenu = PausedMenu(game)
 
     def displayMenu(self):
         self.runDisplay = True
@@ -116,14 +117,15 @@ class GameOverMenu(Menu):
             self.game.drawText("Game over", 30, settings.SCREENWIDTH / 2, settings.SCREENHEIGHT / 2)
             self.game.drawText("Score " + str(self.game.score.score), 25, settings.SCREENWIDTH / 2,
                                (settings.SCREENHEIGHT / 2 + 50))
+            self.game.drawText("Press r to restart", 15, settings.SCREENWIDTH / 2, settings.SCREENHEIGHT / 2 + 80)
             self.game.enterThePausedMenu()
-            self.runDisplay = self.game.currentMenu.running
             self.blitScreen()
 
     def checkInputs(self):
         if self.game.player.condition == "Alive":
             self.runDisplay = False
-
+        if not self.game.running:
+            self.runDisplay = False
 
 class PausedMenu(Menu):
     def __init__(self, game):
@@ -169,7 +171,6 @@ class PausedMenu(Menu):
         self.moveCursor()
         if self.game.START_KEY:
             if self.state == "Continue":
-                self.game.playing = True
                 self.runDisplay = False
                 self.running = True
             elif self.state == "Exit":

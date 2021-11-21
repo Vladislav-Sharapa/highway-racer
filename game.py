@@ -52,9 +52,7 @@ class Game:
             self.clock.tick(settings.FPS)
             self.events()
 
-            if self.player.condition == "Alive":
-                self.update()
-
+            self.update()
             self.draw()
             self.enterThePausedMenu()
 
@@ -78,15 +76,17 @@ class Game:
                     self.UP_KEY = True
                 if event.key == pg.K_ESCAPE:
                     self.ESC_KEY = True
-                    self.currentMenu = PausedMenu(self)
                 if event.key == pg.K_r and self.player.condition != "Alive":
                     self.player.condition = "Alive"
-                    self.initializeObjects()
+                    self.playing = True
                     print("I am alive")
 
     def update(self):
 
         self.player.update(self.listOfCar)
+
+        if self.player.condition != "Alive":
+            self.playing = False
 
         # update car-sprites
         for car in self.listOfCar:
@@ -112,11 +112,7 @@ class Game:
             car.draw(self.screen)
 
         self.player.draw(self.screen)
-
-        if self.player.condition == "Alive":
-            self.score.draw(self)
-        else:
-            self.showGameOverScreen()
+        self.score.draw(self)
 
         pg.display.flip()
 
@@ -133,8 +129,7 @@ class Game:
 
     def enterThePausedMenu(self):
         if self.ESC_KEY:
-            self.ESC_KEY = False
-            self.playing = False
+            self.currentMenu = PausedMenu(self)
             self.currentMenu.displayMenu()
 
     def drawGrid(self):
@@ -151,10 +146,9 @@ class Game:
         pg.draw.line(self.screen, settings.LIGHT_GREY, (18 * settings.TILE_SIZE, 0), (18 * settings.TILE_SIZE,
                                                                                       settings.SCREENHEIGHT))
 
-    def showGameOverScreen(self):
-        self.screen.fill(settings.BLACK)
-        self.drawText("Game over", 30, settings.SCREENWIDTH / 2, settings.SCREENHEIGHT / 2)
-        self.drawText("Score " + str(self.score.score), 25, settings.SCREENWIDTH / 2, (settings.SCREENHEIGHT / 2 + 50))
+    def enterGameOverMenu(self):
+        self.currentMenu = GameOverMenu(self)
+        self.currentMenu.displayMenu()
 
     def initializeObjects(self):
         startY = -100
@@ -172,13 +166,18 @@ class Game:
             self.listOfLines.append(sprites.RoadLine(startY))
             startY += 120
 
+
+        self.position = vec(settings.SCREENWIDTH / 2 - settings.TILE_SIZE / 1.5, settings.SCREENHEIGHT - 4 * settings.TILE_SIZE)
+        self.player.position = self.position
+
+
 class Score:
 
     def __init__(self, startValue):
         self.score = startValue
 
     def update(self, car):
-        if car.rect.y > settings.SCREENHEIGHT - 2:
+        if car.rect.y == 22 * settings.TILE_SIZE :
             self.score += 1
             print("+1")
 
