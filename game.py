@@ -14,13 +14,12 @@ class Game:
 
     def __init__(self):
 
-        self.score = Score(0)
+        self.score = Score()
 
         # for main menu of the game
         self.click = False
-        self. fontName = 'fonts/8-BIT WONDER.TTF'
+        self.fontName = 'fonts/8-BIT WONDER.TTF'
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.ESC_KEY = False, False, False, False, False
-        self.ESC_KEY = False
         self.mainMenu = MainMenu(self)
         self.currentMenu = self.mainMenu
         self.paused = PausedMenu(self)
@@ -40,6 +39,7 @@ class Game:
         self.listOfCar = []
         self.listOfLines = []
 
+        self.speed = 8
 
     def new(self):
 
@@ -91,22 +91,25 @@ class Game:
         # update car-sprites
         for car in self.listOfCar:
             car.update(self)
-            self.score.update(car)
+            self.score.update(car, self)
 
         #TODO изменение позиции линий
         for line in self.listOfLines:
-            line.update()
+            line.update(self.speed)
 
     def draw(self):
 
         # fill the screen with black color
         self.screen.fill(settings.BLACK)
+        pg.draw.rect(self.screen, settings.DARK_GREY, (settings.TILE_SIZE * 7, 0, settings.TILE_SIZE * 11, settings.SCREENHEIGHT))
+        pg.draw.rect(self.screen, settings.LIGHT_GREEN, (0, 0, settings.TILE_SIZE * 7, settings.SCREENHEIGHT))
+        pg.draw.rect(self.screen, settings.LIGHT_GREEN, (settings.TILE_SIZE * 18, 0, settings.SCREENWIDTH, settings.SCREENHEIGHT))
 
         #TODO прорисовка разметки на экране
         for line in self.listOfLines:
             line.draw(self.screen)
 
-        self.drawLineOfRoad()
+        # self.drawGrid()
         # draw car-sprites
         for car in self.listOfCar:
             car.draw(self.screen)
@@ -152,14 +155,15 @@ class Game:
 
     def initializeObjects(self):
         startY = -100
-        self.score.score = 0
+        self.score = Score()
+        self.speed = 3
 
         self.listOfCar.clear()
         self.listOfLines.clear()
 
         for _ in range(0, 4):
             self.listOfCar.append(sprites.Car(startY))
-            startY -= 210
+            startY -= 230
         startY = 30
 
         for line in range(0, 7):
@@ -173,14 +177,22 @@ class Game:
 
 class Score:
 
-    def __init__(self, startValue):
-        self.score = startValue
+    def __init__(self,):
+        self.score = 0
+        self.markOfSpeedUp = 0
 
-    def update(self, car):
-        if car.rect.y == 22 * settings.TILE_SIZE :
-            self.score += 1
-            print("+1")
-
+    def update(self, car, game):
+        if car.rect.y > 22 * settings.TILE_SIZE:
+            if not car.point:
+                self.score += 1
+                self.markOfSpeedUp += 1
+                car.point = True
+                print("+1")
+        if self.markOfSpeedUp == 20:
+            if game.speed != 8:
+                game.speed += 1
+                self.markOfSpeedUp = 0
+                print("speed + 1")
 
     def draw(self, game):
         game.drawText("Score " + str(self.score), 25, 105, 45)

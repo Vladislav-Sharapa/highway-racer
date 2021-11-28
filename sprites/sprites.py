@@ -8,8 +8,9 @@ class Player(pg.sprite.Sprite):
 
     def __init__(self, rectCenter, position):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.Surface((1.5 * settings.TILE_SIZE, 2 * settings.TILE_SIZE))
-        self.image.fill(settings.GREEN)
+        #self.image = pg.Surface((1.5 * settings.TILE_SIZE, 2 * settings.TILE_SIZE))
+        #self.image.fill(settings.GREEN)
+        self.image = pg.image.load(r"D:\Py projects\NewGame\sprites\PNG\player.png")
         self.rect = self.image.get_rect()
         self.rect.center = rectCenter
         self.position = position
@@ -18,6 +19,9 @@ class Player(pg.sprite.Sprite):
         # ускорение персонажа
         self.acceleration = vec(0, 0)
         self.condition = "Alive"
+
+        self.left = False
+        self.right = False
 
     #TODO изменение скорости линий и машин при коллизии игрока и объектов
     def checkCollision(self, listOfCar):
@@ -38,9 +42,17 @@ class Player(pg.sprite.Sprite):
         # update velocity of player
         if keys[pg.K_a]:
             self.velocity.x = -settings.ACCELERATION
+            self.left = True
+        else:
+            self.left = False
 
         if keys[pg.K_d]:
             self.velocity.x = settings.ACCELERATION
+            self.right = True
+        else:
+            self.right = False
+
+        self.animation()
 
         # apply player friction
         self.acceleration += self.velocity * settings.FRICTION
@@ -63,6 +75,13 @@ class Player(pg.sprite.Sprite):
         self.rect.x = self.position.x
         self.rect.y = self.position.y
 
+    def animation(self):
+        if self.left:
+            self.image = pg.image.load(settings.PLAYER_ANIMATION[0])
+        elif self.right:
+            self.image = pg.image.load(settings.PLAYER_ANIMATION[2])
+        else:
+            self.image = pg.image.load(settings.PLAYER_ANIMATION[1])
 
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x, self.rect.y))
@@ -73,20 +92,24 @@ class Car(pg.sprite.Sprite):
     def __init__(self, startY):
         pg.sprite.Sprite.__init__(self)
 
-        self.image = pg.Surface((1.5 * settings.TILE_SIZE, 3 * settings.TILE_SIZE))
-        self.image.fill(settings.YELLOW)
+        # self.image = pg.Surface((1.5 * settings.TILE_SIZE, 3 * settings.TILE_SIZE))
+        # self.image.fill(settings.YELLOW)
+        self.image = pg.image.load(random.choice(settings.SPRITE_LIST))
         self.rect = self.image.get_rect()
+        self.point = False
 
         self.rect.x = random.randint(250, 520)
         self.rect.y = startY
-        self.speed = settings.CAR_SPEED
 
     def update(self, game):
-        self.rect.y += self.speed
+        self.rect.y += game.speed
 
         if self.rect.y > settings.SCREENHEIGHT:
             self.rect.x = random.randint(250, 520)
-            self.rect.y = -100
+            self.rect.y = -120
+            self.image = pg.image.load(random.choice(settings.SPRITE_LIST))
+        if self.point is True and self.rect.y < 22 * settings.TILE_SIZE:
+            self.point = False
 
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x, self.rect.y))
@@ -100,13 +123,12 @@ class RoadLine:
         self.rect = self.image.get_rect()
         self.rect.x = settings.SCREENWIDTH / 2 - 5
         self.rect.y = y
-        self.speed = settings.CAR_SPEED
 
-    def update(self):
-        self.rect.y += self.speed
+    def update(self, speed):
+        self.rect.y += speed
 
         if self.rect.y > settings.SCREENHEIGHT:
-            self.rect.y = -100
+            self.rect.y = -130
 
     def draw(self, screen):
             screen.blit(self.image, (self.rect.x, self.rect.y))
