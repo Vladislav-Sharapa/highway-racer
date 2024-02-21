@@ -1,47 +1,41 @@
-import pygame as pg
-import settings
-import random
-
 from menu import *
 from sprites import sprites
+import time
 
 vec = pg.math.Vector2
-
 
 class Game:
     rectCenter = (settings.SCREENWIDTH / 2 - settings.TILE_SIZE, settings.SCREENHEIGHT - 4 * settings.TILE_SIZE)
     position = vec(settings.SCREENWIDTH / 2 - settings.TILE_SIZE / 1.5, settings.SCREENHEIGHT - 4 * settings.TILE_SIZE)
 
     def __init__(self):
+        pg.init()
 
         self.score = Score()
 
         # for main menu of the game
         self.click = False
-        self.fontName = 'fonts/8-BIT WONDER.TTF'
+        self.fontName = settings.FONT_LINK
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.ESC_KEY = False, False, False, False, False
         self.mainMenu = MainMenu(self)
         self.currentMenu = self.mainMenu
         self.paused = PausedMenu(self)
         self.gameOver = GameOverMenu(self)
 
-        pg.init()
-
         self.screen = pg.display.set_mode((settings.SCREENWIDTH, settings.SCREENHEIGHT))
         self.clock = pg.time.Clock()
 
         self.player = sprites.Player(self.rectCenter, self.position)
-
         self.running = True
         self.playing = True
-
         # container for car-object
         self.listOfCar = []
         self.listOfLines = []
-
-        self.speed = 8
+        self.speed = 0
 
     def new(self):
+        self.currentMenu.carStartSound.play()
+        time.sleep(4)
 
         self.initializeObjects()
         self.run()
@@ -56,9 +50,11 @@ class Game:
             self.draw()
             self.enterThePausedMenu()
 
+            if not pg.mixer.get_busy():
+                self.player.carSpeed.play(loops=0, maxtime=0, fade_ms=1)
+
     def events(self):
-        # Game loop events handler
-        for event in pg.event.get():
+        for event in pg.event.get():  # Game loop events handler
             if event.type == pg.QUIT:
                 if self.playing:
                     self.playing = False
@@ -83,38 +79,35 @@ class Game:
 
     def update(self):
 
-        self.player.update(self.listOfCar)
+        self.player.update(self.listOfCar)  # change players position
 
         if self.player.condition != "Alive":
             self.playing = False
 
-        # update car-sprites
-        for car in self.listOfCar:
+        for car in self.listOfCar:  
             car.update(self)
-            self.score.update(car, self)
+            self.score.update(car, self) 
 
-        #TODO изменение позиции линий
+    
         for line in self.listOfLines:
             line.update(self.speed)
 
     def draw(self):
 
-        # fill the screen with black color
         self.screen.fill(settings.BLACK)
+
+        # draw enviroment
         pg.draw.rect(self.screen, settings.DARK_GREY, (settings.TILE_SIZE * 7, 0, settings.TILE_SIZE * 11, settings.SCREENHEIGHT))
         pg.draw.rect(self.screen, settings.LIGHT_GREEN, (0, 0, settings.TILE_SIZE * 7, settings.SCREENHEIGHT))
         pg.draw.rect(self.screen, settings.LIGHT_GREEN, (settings.TILE_SIZE * 18, 0, settings.SCREENWIDTH, settings.SCREENHEIGHT))
 
-        #TODO прорисовка разметки на экране
-        for line in self.listOfLines:
+        for line in self.listOfLines:  # draw road lines
             line.draw(self.screen)
 
-        # self.drawGrid()
-        # draw car-sprites
-        for car in self.listOfCar:
+        for car in self.listOfCar:  # draw cars
             car.draw(self.screen)
 
-        self.player.draw(self.screen)
+        self.player.draw(self.screen)  # draw player
         self.score.draw(self)
 
         pg.display.flip()
@@ -135,13 +128,6 @@ class Game:
             self.currentMenu = PausedMenu(self)
             self.currentMenu.displayMenu()
 
-    def drawGrid(self):
-        for x in range(0, settings.SCREENWIDTH, settings.TILE_SIZE):
-            pg.draw.line(self.screen, settings.LIGHT_GREY, (x, 0), (x, settings.SCREENHEIGHT))
-
-        for y in range(0, settings.SCREENHEIGHT, settings.TILE_SIZE):
-            pg.draw.line(self.screen, settings.LIGHT_GREY, (0, y), (settings.SCREENWIDTH, y))
-
     def drawLineOfRoad(self):
         pg.draw.line(self.screen, settings.LIGHT_GREY, (7 * settings.TILE_SIZE, 0), (7 * settings.TILE_SIZE,
                                                                                      settings.SCREENHEIGHT))
@@ -153,6 +139,10 @@ class Game:
         self.currentMenu = GameOverMenu(self)
         self.currentMenu.displayMenu()
 
+    def starGameScreen(self):
+        self.screen.fill(settings.BLACK)
+        self.drawText('Get started . . .', 40, settings.SCREENWIDTH / 2, settings.SCREENHEIGHT / 2 - 20)
+
     def initializeObjects(self):
         startY = -100
         self.score = Score()
@@ -161,8 +151,13 @@ class Game:
         self.listOfCar.clear()
         self.listOfLines.clear()
 
-        for _ in range(0, 4):
-            self.listOfCar.append(sprites.Car(startY))
+        for _ in range(0, 3):
+            self.listOfCar.append(sprites.CarLeft(startY, 230, 345))
+            startY -= 230
+        startY = -120
+
+        for _ in range(0, 3):
+            self.listOfCar.append(sprites.CarRight(startY, 390, 540))
             startY -= 230
         startY = 30
 
