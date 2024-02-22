@@ -1,8 +1,4 @@
 import pygame as pg
-import settings
-
-import pygame as pg
-import settings
 import game
 
 def main():
@@ -17,7 +13,7 @@ def main():
     pg.display.quit()
     pg.quit()
 
+    print("Thanks for playing. . .")
 
 if __name__ == "__main__":
     main()
-
