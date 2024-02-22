@@ -10,6 +10,9 @@ class Menu:
         self.runDisplay = True
         self.cursorRect = pg.Rect(0, 0, 20, 20)
         self.offset = - 160
+        pg.mixer.init()
+        self.menuSound = pg.mixer.Sound(r'music\sounds\menu_selection.wav')  
+        self.carStartSound = pg.mixer.Sound(r'music\sounds\car_sounds\car_start.wav')
 
     def drawCursor(self):
         self.game.drawText("*", 25, self.cursorRect.x, self.cursorRect.y)
@@ -20,6 +23,10 @@ class Menu:
         pg.display.update()
         self.game.resetKeys()
 
+    def soundSelection(self):
+        if self.game.UP_KEY or self.game.DOWN_KEY:
+            self.menuSound.play()
+
 
 class MainMenu(Menu):
     def __init__(self, game):
@@ -29,12 +36,14 @@ class MainMenu(Menu):
         self.creditsX, self.creditsY = self.middleWidth, self.middleHeight + 80
         self.exitX, self.exitY = self.middleWidth, self.middleHeight + 120
         self.cursorRect.midtop = (self.startX + self.offset, self.startY)
-
         self.creditMenu = CreditMenu(game)
+        pg.mixer.music.load(r"music\main_menu_sound.mp3")
+        pg.mixer.music.set_volume(0.8)
 
 
     def displayMenu(self):
         self.runDisplay = True
+        pg.mixer.music.play(loops=-1)  # проигрываем мелодию main_menu_music
         while self.runDisplay:
             self.game.events()
             self.checkInputs()
@@ -47,6 +56,7 @@ class MainMenu(Menu):
             self.blitScreen()
 
     def moveCursor(self):
+        self.soundSelection()
         if self.game.DOWN_KEY:
             if self.state == "Start":
                 self.cursorRect.midtop = (self.creditsX + self.offset, self.creditsY)
@@ -75,6 +85,10 @@ class MainMenu(Menu):
             if self.state == "Start":
                 self.game.playing = True
                 self.runDisplay = False
+                pg.mixer.music.stop()  
+                pg.mixer.music.unload()
+                pg.mixer.music.load(r"music\paused_menu_sound.mp3")
+
             elif self.state == "Exit":
                 self.runDisplay = False
                 self.game.playing = False
@@ -96,7 +110,7 @@ class CreditMenu(Menu):
             self.checkInputs()
             self.game.screen.fill(settings.BLACK)
             self.game.drawText('Made by student of 1220', 30, settings.SCREENWIDTH / 2, settings.SCREENHEIGHT / 2 - 20)
-            self.game.drawText("Sharapa Vladislav", 30, self.startX, self.startY)
+            self.game.drawText("BNTU", 30, self.startX, self.startY)
             self.blitScreen()
 
     def checkInputs(self):
@@ -109,6 +123,7 @@ class GameOverMenu(Menu):
         self.currentMenu = PausedMenu(game)
 
     def displayMenu(self):
+        self.game.player.carSpeed.stop()
         self.runDisplay = True
         while self.runDisplay:
             self.game.events()
@@ -137,6 +152,8 @@ class PausedMenu(Menu):
         self.running = True
 
     def displayMenu(self):
+        self.game.player.carSpeed.stop()
+        pg.mixer.music.play()
         self.runDisplay = True
         while self.runDisplay:
             self.game.events()
@@ -150,6 +167,7 @@ class PausedMenu(Menu):
 
 
     def moveCursor(self):
+        self.soundSelection()
         if self.game.DOWN_KEY:
             if self.state == "Continue":
                 self.cursorRect.midtop = (self.exitX - 120, self.exitY)
@@ -173,6 +191,7 @@ class PausedMenu(Menu):
             if self.state == "Continue":
                 self.runDisplay = False
                 self.running = True
+                pg.mixer.music.stop()
             elif self.state == "Exit":
                 self.runDisplay = False
                 self.game.playing = False
