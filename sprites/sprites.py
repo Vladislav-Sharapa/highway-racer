@@ -88,57 +88,43 @@ class Player(pg.sprite.Sprite):
 
 class Car(pg.sprite.Sprite):
 
-    def __init__(self):
+    def __init__(self, startY, xMin, xMax, sprite_list):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.image.load(random.choice(settings.SPRITE_LIST_LEFT))
+        self.sprite_list = sprite_list
+        self.image = pg.image.load(random.choice(sprite_list))
         self.rect = self.image.get_rect()
+        self.rect.x = random.randint(xMin, xMax)
+        self.rect.y = startY
+        self.xMin = xMin
+        self.xMax = xMax
         self.point = False
+
+    def update(self) -> None:
+        if self.rect.y > settings.SCREENHEIGHT:
+            self.rect.x = random.randint(self.xMin, self.xMax)
+            self.rect.y = -120
+            self.image = pg.image.load(random.choice(self.sprite_list))
+        if self.point is True and self.rect.y < 22 * settings.TILE_SIZE:
+            self.point = False
 
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
 class CarLeft(Car):
     def __init__(self, startY, xMin, xMax):
-        Car.__init__(self)
-        self.image = pg.image.load(random.choice(settings.SPRITE_LIST_LEFT))
-        self.rect.x = random.randint(xMin, xMax)
-        self.rect.y = startY
-
-        self.xMin = xMin
-        self.xMax = xMax
+        super().__init__(startY, xMin, xMax, settings.SPRITE_LIST_LEFT)
 
     def update(self, game):
-        self.rect.y += game.speed + 1
-
-        if self.rect.y > settings.SCREENHEIGHT:
-            #self.rect.x = random.randint(250, 520)
-            self.rect.x = random.randint(self.xMin, self.xMax)
-            self.rect.y = -120
-            self.image = pg.image.load(random.choice(settings.SPRITE_LIST_LEFT))
-        if self.point is True and self.rect.y < 22 * settings.TILE_SIZE:
-            self.point = False
-
+        self.rect.y += game.speed + 1 # speed of left cars
+        super().update()
 
 class CarRight(Car):
     def __init__(self, startY, xMin, xMax):
-        Car.__init__(self)
-        self.image = pg.image.load(random.choice(settings.SPRITE_LIST_RIGHT))
-        self.rect.x = random.randint(xMin, xMax)
-        self.rect.y = startY
-
-        self.xMin = xMin
-        self.xMax = xMax
-
+        super().__init__(startY, xMin, xMax, settings.SPRITE_LIST_RIGHT)
 
     def update(self, game):
-        self.rect.y += game.speed - 2
-
-        if self.rect.y > settings.SCREENHEIGHT:
-            self.rect.x = random.randint(self.xMin, self.xMax)
-            self.rect.y = -120
-            self.image = pg.image.load(random.choice(settings.SPRITE_LIST_RIGHT))
-        if self.point is True and self.rect.y < 22 * settings.TILE_SIZE:
-            self.point = False
+        self.rect.y += game.speed - 2 # speed of right cars
+        super().update()
 
 class RoadLine:
 
