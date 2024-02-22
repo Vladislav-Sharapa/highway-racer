@@ -1,4 +1,4 @@
-TITLE = "TITLE OF THE GAME"
+TITLE = "RACE GAME"
 
 SCREENWIDTH = 800
 SCREENHEIGHT = 768
@@ -25,11 +25,19 @@ ACCELERATION = 3
 # Трение
 FRICTION = -0.24
 
-SPRITE_LIST = [r"D:\Py projects\NewGame\sprites\PNG\car_1.png", r"D:\Py projects\NewGame\sprites\PNG\car_2.png",
-               r"D:\Py projects\NewGame\sprites\PNG\car_3.png", r"D:\Py projects\NewGame\sprites\PNG\car_4.png",
-               r"D:\Py projects\NewGame\sprites\PNG\car_5.png"]
+FONT_LINK = 'fonts/8-BIT WONDER.TTF'
 
-PLAYER_ANIMATION = [r"D:\Py projects\NewGame\sprites\PNG\player_left.png",
-                    r"D:\Py projects\NewGame\sprites\PNG\player.png",
-                    r"D:\Py projects\NewGame\sprites\PNG\player_right.png"]
+SPRITE_LIST_LEFT = [r"sprites\PNG\left_car\car_1.png", r"sprites\PNG\left_car\car_2.png",
+                    r"sprites\PNG\left_car\car_3.png", r"sprites\PNG\left_car\car_4.png",
+                    r"sprites\PNG\left_car\car_5.png"]
+
+SPRITE_LIST_RIGHT = [r"sprites\PNG\right_car\car_1.png", r"sprites\PNG\right_car\car_2.png",
+                     r"sprites\PNG\right_car\car_3.png",
+                     r"sprites\PNG\right_car\car_4.png", r"sprites\PNG\right_car\car_5.png"]
+
+PLAYER_ANIMATION = [r"sprites\PNG\player_left.png",
+                    r"sprites\PNG\player.png",
+                    r"sprites\PNG\player_right.png"]
+
+MUSIC_LIST = [r"music\main_menu_sound.mp3", r"music\paused_menu_sound.mp3"]
 
