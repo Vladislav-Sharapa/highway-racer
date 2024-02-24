@@ -1,4 +1,4 @@
-# Race game
+# Highway Racer
 
 Highway Racer is game where you take on the role of driver maneuvering through traffic on a busy highway. Your goal is to zigzag through incoming and outgoing vehicles to score points and reach the highest possible score.
 
