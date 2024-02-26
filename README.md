@@ -44,3 +44,4 @@ $ python main.py
 - **:arrow_up:**: move point up 
 - **:arrow_down:**: move point down
 - **Enter**: select point
+- **ESC**: pause game
